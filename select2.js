@@ -540,7 +540,6 @@
                 formatInputTooShort: function (input, min) { return "Please enter " + (min - input.length) + " more characters"; },
                 minimumResultsForSearch: 0,
                 minimumInputLength: 0,
-                zIndex: 2000,
                 id: function (e) { return e.id; },
                 matcher: function(term, text) {
                     return text.toUpperCase().indexOf(term.toUpperCase()) >= 0;
@@ -655,8 +654,7 @@
             this.dropdown.css({
                 top: offset.top + height,
                 left: offset.left,
-                width: width,
-                "z-index": this.opts.zIndex
+                width: width
             });
         },
 
