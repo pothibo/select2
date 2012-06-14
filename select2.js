@@ -541,6 +541,7 @@
                 minimumResultsForSearch: 0,
                 minimumInputLength: 0,
                 zIndex: 2000,
+                showSearchInput: false,
                 id: function (e) { return e.id; },
                 matcher: function(term, text) {
                     return text.toUpperCase().indexOf(term.toUpperCase()) >= 0;
@@ -820,14 +821,14 @@
                 postRender();
             }
 
-            if (search.val().length < opts.minimumInputLength) {
+            if (opts.showSearchInput === true && search.val().length < opts.minimumInputLength) {
                 render("<li class='select2-no-results'>" + opts.formatInputTooShort(search.val(), opts.minimumInputLength) + "</li>");
                 return;
             }
 
             this.resultsPage = 1;
             opts.query({
-                    term: search.val(),
+                    term: opts.showSearchInput === true ? search.val() : "",
                     page: this.resultsPage,
                     context: null,
                     matcher: opts.matcher,
@@ -835,7 +836,7 @@
                 var def; // default choice
 
                 // create a default choice and prepend it to the list
-                if (this.opts.createSearchChoice && search.val() !== "") {
+                if (opts.showSearchInput === true && opts.createSearchChoice && search.val() !== "") {
                     def = this.opts.createSearchChoice.call(null, search.val(), data.results);
                     if (def !== undefined && def !== null && self.id(def) !== undefined && self.id(def) !== null) {
                         if ($(data.results).filter(
@@ -930,21 +931,24 @@
     SingleSelect2 = clazz(AbstractSelect2, {
 
         createContainer: function () {
-            return $("<div></div>", {
-                "class": "select2-container",
-                "style": "width: " + this.getContainerWidth()
-            }).html([
+            var container = $([
                 "    <a href='javascript:void(0)' class='select2-choice'>",
                 "   <span></span><abbr class='select2-search-choice-close' style='display:none;'></abbr>",
                 "   <div><b></b></div>" ,
                 "</a>",
                 "    <div class='select2-drop' style='display:none;'>" ,
-                "   <div class='select2-search'>" ,
-                "       <input type='text' autocomplete='off'/>" ,
-                "   </div>" ,
                 "   <ul class='select2-results'>" ,
                 "   </ul>" ,
-                "</div>"].join(""));
+                "</div>"].join(""))
+            if (this.opts.showSearchInput === true) {
+                $(["   <div class='select2-search'>",
+                "       <input type='text' autocomplete='off'/>" ,
+                "   </div>"].join("")).insertBefore(container.find("ul"))
+            }
+            return $("<div></div>", {
+                "class": "select2-container",
+                "style": "width: " + this.getContainerWidth()
+            }).html(container);
         },
 
         open: function () {
@@ -1186,20 +1190,23 @@
     MultiSelect2 = clazz(AbstractSelect2, {
 
         createContainer: function () {
-            return $("<div></div>", {
-                "class": "select2-container select2-container-multi",
-                "style": "width: " + this.getContainerWidth()
-            }).html([
+            var container = $([
                 "    <ul class='select2-choices'>",
-                //"<li class='select2-search-choice'><span>California</span><a href="javascript:void(0)" class="select2-search-choice-close"></a></li>" ,
-                "  <li class='select2-search-field'>" ,
-                "    <input type='text' autocomplete='off' style='width: 25px;'>" ,
-                "  </li>" ,
                 "</ul>" ,
                 "<div class='select2-drop select2-drop-multi' style='display:none;'>" ,
                 "   <ul class='select2-results'>" ,
                 "   </ul>" ,
-                "</div>"].join(""));
+                "</div>"].join(""))
+            if (this.opts.showSearchInput === true) {
+                container.find("ul:first-child").append([
+                "  <li class='select2-search-field'>" ,
+                "    <input type='text' autocomplete='off' style='width: 25px;'>" ,
+                "  </li>"].join(""))
+            }
+            return $("<div></div>", {
+                "class": "select2-container select2-container-multi",
+                "style": "width: " + this.getContainerWidth()
+            }).html(container);
         },
 
         prepareOpts: function () {
