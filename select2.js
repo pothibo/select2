@@ -541,7 +541,7 @@
                 minimumResultsForSearch: 0,
                 minimumInputLength: 0,
                 zIndex: 2000,
-                showSearchInput: false,
+                showSearchInput: true,
                 id: function (e) { return e.id; },
                 matcher: function(term, text) {
                     return text.toUpperCase().indexOf(term.toUpperCase()) >= 0;
