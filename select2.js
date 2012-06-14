@@ -72,7 +72,7 @@
     function indexOf(value, array) {
         var i = 0, l = array.length, v;
 
-        if (typeof value == 'undefined') {
+        if (typeof value === "undefined") {
           return -1;
         }
 
@@ -246,7 +246,6 @@
                         }
                         // TODO 3.0 - replace query.page with query so users have access to term, page, etc.
                         var results = options.results(data, query.page);
-                        self.context = results.context;
                         query.callback(results);
                     }
                 });
@@ -541,6 +540,7 @@
                 minimumResultsForSearch: 0,
                 minimumInputLength: 0,
                 zIndex: 2000,
+                minimumWidth: undefined,
                 id: function (e) { return e.id; },
                 matcher: function(term, text) {
                     return text.toUpperCase().indexOf(term.toUpperCase()) >= 0;
@@ -834,6 +834,9 @@
                     callback: this.bind(function (data) {
                 var def; // default choice
 
+                // save context, if any
+                this.context = (data.context===undefined) ? null : data.context;
+
                 // create a default choice and prepend it to the list
                 if (this.opts.createSearchChoice && search.val() !== "") {
                     def = this.opts.createSearchChoice.call(null, search.val(), data.results);
@@ -909,7 +912,7 @@
          * @returns The width string (with units) for the container.
          */
         getContainerWidth: function () {
-            var style, attrs, matches, i, l;
+            var style, attrs, matches, i, l, width=0, elWidth;
             if (this.opts.width !== undefined)
                 return this.opts.width;
 
@@ -923,7 +926,12 @@
                         return matches[1];
                 }
             }
-            return this.opts.element.width() + 'px';
+            if (this.opts.minimumWidth !== undefined) {
+                width = parseFloat(this.opts.minimumWidth);
+            }
+            elWidth = this.opts.element.width()
+
+            return (elWidth > width ? elWidth : width)+ 'px';
         }
     });
 
@@ -1572,7 +1580,6 @@
                 val = (val === null) ? [] : val;
                 this.setVal(val);
                 // val is a list of objects
-                                                                                                     st
                 $(val).each(function () { data.push(self.id(this)); });
                 this.setVal(data);
                 this.updateSelection(val);
